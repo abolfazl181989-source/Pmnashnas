@@ -1,0 +1,797 @@
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#050505">
+  <title>NEON MSG | پیام ناشناس</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- فونت فارسی -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --green: #00ff66;
+      --bg: #050505;
+      --panel: #0d110f;
+      --border: rgba(0,255,102,.19);
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Vazirmatn', sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: #f5f5f5;
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(0,255,102,.09), transparent 48%),
+        #050505;
+    }
+
+    button, input, textarea { font: inherit; }
+    button { cursor: pointer; }
+
+    .neon { color: var(--green); }
+
+    .glow {
+      box-shadow: 0 0 25px rgba(0,255,102,.10),
+                  inset 0 0 15px rgba(0,255,102,.025);
+    }
+
+    .panel {
+      background: rgba(13,17,15,.94);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      box-shadow: 0 0 35px rgba(0,255,102,.035);
+    }
+
+    .field {
+      width: 100%;
+      color: white;
+      background: #080b09;
+      border: 1px solid #26352b;
+      border-radius: 14px;
+      padding: 14px 16px;
+      outline: none;
+      transition: .25s;
+    }
+
+    .field:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 18px rgba(0,255,102,.10);
+    }
+
+    .primary {
+      color: #001b09;
+      font-weight: 800;
+      background: linear-gradient(135deg,#00ff66,#8affb4);
+      border-radius: 14px;
+      padding: 14px 18px;
+      transition: .25s;
+    }
+
+    .primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 24px rgba(0,255,102,.22);
+    }
+
+    .secondary {
+      color: var(--green);
+      border: 1px solid rgba(0,255,102,.28);
+      background: rgba(0,255,102,.045);
+      border-radius: 12px;
+      padding: 10px 14px;
+      transition: .2s;
+    }
+
+    .secondary:hover { background: rgba(0,255,102,.12); }
+
+    .hidden-page { display: none !important; }
+
+    .fade-in { animation: fadeIn .45s ease both; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      display: inline-block;
+      box-shadow: 0 0 10px var(--green);
+    }
+
+    .message-card {
+      background: linear-gradient(135deg,#101712,#0a0c0b);
+      border: 1px solid #25372b;
+      border-radius: 17px;
+      padding: 17px;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      z-index: 100;
+      transform: translate(-50%,20px);
+      opacity: 0;
+      pointer-events: none;
+      background: #122219;
+      border: 1px solid #00ff66;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 13px;
+      transition: .3s;
+      width: max-content;
+      max-width: 90%;
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%,0);
+    }
+
+    .loading {
+      width: 17px;
+      height: 17px;
+      display: inline-block;
+      border: 2px solid #003b19;
+      border-top-color: #001b09;
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .challenge {
+      border: 1px solid #26352b;
+      border-radius: 13px;
+      padding: 12px;
+      background: #090d0a;
+      text-align: right;
+      transition: .2s;
+    }
+
+    .challenge:hover {
+      border-color: var(--green);
+      background: #101a12;
+    }
+
+    .share-card {
+      background:
+        radial-gradient(circle at top right,rgba(0,255,102,.15),transparent 50%),
+        #080b09;
+      border: 1px solid #00ff66;
+      border-radius: 20px;
+      padding: 28px;
+      overflow-wrap: anywhere;
+    }
+
+    footer { color: #737b75; }
+
+    @media (max-width: 480px) {
+      .panel { border-radius: 17px; }
+      .hero-title { font-size: 2.5rem; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- سربرگ -->
+  <header class="max-w-5xl mx-auto px-4 py-5 flex items-center justify-between gap-3">
+    <button onclick="goHome()" class="flex items-center gap-2 text-right">
+      <span class="w-10 h-10 rounded-xl bg-green-400/10 border border-green-400/30 flex items-center justify-center neon font-black">N</span>
+      <span>
+        <span class="block font-black tracking-wide">NEON <span class="neon">MSG</span></span>
+        <span class="block text-xs text-gray-500">پیام ناشناس</span>
+      </span>
+    </button>
+
+    <button onclick="showInbox()" class="secondary text-sm">
+      صندوق پیام‌ها
+    </button>
+  </header>
+
+  <main class="max-w-3xl mx-auto px-4 pb-12">
+
+    <!-- صفحه اصلی -->
+    <section id="homePage" class="fade-in">
+      <div class="text-center pt-12 pb-8">
+        <div class="inline-flex items-center gap-2 rounded-full border border-green-400/20 bg-green-400/5 px-4 py-2 text-xs text-gray-300 mb-7">
+          <span class="dot"></span>
+          حرف دلت رو بدون اسم بگو
+        </div>
+
+        <h1 class="hero-title text-5xl md:text-6xl font-black leading-tight mb-5">
+          حرف‌هایی که<br>
+          <span class="neon">جرئت گفتنش رو نداری</span>
+        </h1>
+
+        <p class="text-gray-400 leading-8 max-w-xl mx-auto">
+          لینک اختصاصی خودت رو بساز، با دوستات به اشتراک بذار
+          و پیام‌های ناشناسشون رو دریافت کن.
+        </p>
+      </div>
+
+      <div class="panel glow p-5 sm:p-7 max-w-xl mx-auto">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-11 h-11 rounded-xl bg-green-400/10 flex items-center justify-center text-xl">✳</div>
+          <div>
+            <h2 class="font-bold text-lg">لینک اختصاصی تو</h2>
+            <p class="text-xs text-gray-500 mt-1">فقط یک نام انتخاب کن</p>
+          </div>
+        </div>
+
+        <form id="usernameForm" class="space-y-4">
+          <label class="block text-sm text-gray-300" for="usernameInput">
+            اسم یا نام کاربری
+          </label>
+
+          <input
+            id="usernameInput"
+            class="field"
+            type="text"
+            maxlength="24"
+            autocomplete="nickname"
+            placeholder="مثلاً abolfazl_77"
+            required
+          >
+
+          <p class="text-xs text-gray-500">
+            حروف انگلیسی، عدد و زیرخط مجاز هستند.
+          </p>
+
+          <button type="submit" id="createButton" class="primary w-full">
+            ساخت لینک اختصاصی من ←
+          </button>
+        </form>
+
+        <div class="grid grid-cols-3 gap-2 mt-6 text-center">
+          <div class="rounded-xl bg-white/[.025] p-3">
+            <div class="neon text-lg">匿名</div>
+            <div class="text-xs text-gray-500 mt-1">ناشناس</div>
+          </div>
+          <div class="rounded-xl bg-white/[.025] p-3">
+            <div class="neon text-lg">∞</div>
+            <div class="text-xs text-gray-500 mt-1">حرف آزاد</div>
+          </div>
+          <div class="rounded-xl bg-white/[.025] p-3">
+            <div class="neon text-lg">✦</div>
+            <div class="text-xs text-gray-500 mt-1">رایگان</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- چالش‌ها -->
+      <div class="mt-10">
+        <h2 class="text-xl font-extrabold mb-2">💬 ایده برای پیام ناشناس</h2>
+        <p class="text-sm text-gray-500 mb-4">یکی از این چالش‌ها رو با دوستات به اشتراک بذار.</p>
+
+        <div class="grid sm:grid-cols-2 gap-3">
+          <button class="challenge" onclick="useChallenge('حقیقتی درباره من بگو که خودم نمی‌دونم!')">
+            <span class="neon text-sm">چالش 01</span>
+            <p class="mt-2">حقیقتی درباره من بگو که خودم نمی‌دونم!</p>
+          </button>
+
+          <button class="challenge" onclick="useChallenge('سه تا از ویژگی‌های خوب و بدم رو بگو.')">
+            <span class="neon text-sm">چالش 02</span>
+            <p class="mt-2">سه تا از ویژگی‌های خوب و بدم رو بگو.</p>
+          </button>
+
+          <button class="challenge" onclick="useChallenge('اگه حرفی تو دلت مونده، الان بگو!')">
+            <span class="neon text-sm">چالش 03</span>
+            <p class="mt-2">اگه حرفی تو دلت مونده، الان بگو!</p>
+          </button>
+
+          <button class="challenge" onclick="useChallenge('اولین برداشتت از من چی بود؟')">
+            <span class="neon text-sm">چالش 04</span>
+            <p class="mt-2">اولین برداشتت از من چی بود؟</p>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- صفحه صندوق پیام -->
+    <section id="inboxPage" class="hidden-page fade-in">
+      <div class="panel p-5 sm:p-7 mt-5">
+        <div class="flex items-center justify-between gap-3 mb-6">
+          <div>
+            <p class="text-sm text-gray-500">پروفایل اختصاصی</p>
+            <h1 id="profileName" class="text-2xl font-black neon mt-1">@username</h1>
+          </div>
+          <button onclick="goHome()" class="secondary text-sm">ویرایش نام</button>
+        </div>
+
+        <div class="rounded-2xl border border-green-400/20 bg-green-400/[.04] p-4 mb-7">
+          <p class="text-sm font-bold mb-3">🔗 لینک ناشناس خودت</p>
+          <input id="profileLink" class="field text-sm mb-3" readonly>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="copyProfileLink()" class="primary">کپی لینک</button>
+            <button onclick="shareProfileLink()" class="secondary">اشتراک‌گذاری</button>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between gap-3 mb-4">
+          <div>
+            <h2 class="text-xl font-black">صندوق پیام‌ها</h2>
+            <p class="text-xs text-gray-500 mt-1">پیام‌های دریافتی تو</p>
+          </div>
+          <span id="messageCount" class="rounded-full bg-green-400/10 text-green-400 px-3 py-1 text-sm">۰ پیام</span>
+        </div>
+
+        <div id="messagesList" class="space-y-3"></div>
+
+        <div class="mt-6 border-t border-white/5 pt-5">
+          <button onclick="clearMessages()" class="text-sm text-red-400 hover:text-red-300">
+            حذف تمام پیام‌ها
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- صفحه ارسال پیام -->
+    <section id="sendPage" class="hidden-page fade-in">
+      <div class="text-center pt-10 pb-6">
+        <div class="w-20 h-20 rounded-3xl border border-green-400/30 bg-green-400/10 flex items-center justify-center text-4xl mx-auto mb-5">✉</div>
+        <p class="text-gray-500 text-sm">ارسال پیام ناشناس برای</p>
+        <h1 id="recipientName" class="text-3xl font-black neon mt-2">@username</h1>
+        <p class="text-gray-400 mt-4 leading-7">
+          راحت باش! حرفی که همیشه می‌خواستی بگی رو بنویس.
+        </p>
+      </div>
+
+      <div class="panel glow p-5 sm:p-7 max-w-xl mx-auto">
+        <form id="sendForm" class="space-y-4">
+          <label for="messageInput" class="block text-sm font-bold">پیام تو</label>
+
+          <textarea
+            id="messageInput"
+            class="field resize-y"
+            rows="6"
+            maxlength="1000"
+            minlength="1"
+            placeholder="یه حرف قشنگ، یه اعتراف، یه انتقاد... هرچی تو دلت هست 💚"
+            required
+          ></textarea>
+
+          <div class="flex justify-between text-xs text-gray-500">
+            <span>بدون نیاز به ثبت‌نام</span>
+            <span id="charCount">۰ / ۱۰۰۰</span>
+          </div>
+
+          <button type="submit" id="sendButton" class="primary w-full">
+            ارسال پیام ناشناس ✦
+          </button>
+
+          <p class="text-xs text-gray-500 text-center leading-6">
+            اطلاعات شخصی یا رمز عبورت رو داخل پیام ننویس.
+          </p>
+        </form>
+
+        <div id="successBox" class="hidden-page text-center py-8">
+          <div class="text-5xl mb-4">✓</div>
+          <h2 class="text-xl font-black neon mb-3">پیام ارسال شد!</h2>
+          <p class="text-gray-300 leading-7">
+            پیام شما با موفقیت ثبت شد.
+          </p>
+          <button onclick="resetSendForm()" class="secondary mt-5">ارسال پیام دیگر</button>
+        </div>
+      </div>
+
+      <div class="text-center mt-6">
+        <button onclick="goHome()" class="text-sm text-gray-500 hover:text-green-400">
+          تو هم لینک اختصاصی خودت رو بساز ←
+        </button>
+      </div>
+    </section>
+
+    <!-- کارت آماده اشتراک‌گذاری -->
+    <section id="sharePage" class="hidden-page fade-in mt-6">
+      <div class="panel p-5 sm:p-7">
+        <h2 class="text-xl font-black mb-5">کارت پیام</h2>
+
+        <div id="shareCard" class="share-card">
+          <div class="flex items-center gap-2 mb-8">
+            <span class="dot"></span>
+            <span class="font-black">NEON <span class="neon">MSG</span></span>
+          </div>
+
+          <p class="text-gray-500 text-sm mb-4">یک پیام ناشناس</p>
+          <p id="shareCardText" class="text-xl leading-9 font-semibold whitespace-pre-wrap"></p>
+
+          <div class="border-t border-green-400/20 mt-8 pt-4 flex items-center justify-between text-xs text-gray-500">
+            <span>حرف دلت رو بگو</span>
+            <span class="neon">✦ ANONYMOUS</span>
+          </div>
+        </div>
+
+        <p class="text-xs text-gray-500 leading-6 mt-4">
+          برای ذخیره تصویر، از کارت اسکرین‌شات بگیر.
+        </p>
+
+        <div class="grid grid-cols-2 gap-3 mt-5">
+          <button onclick="shareMessageText()" class="primary">اشتراک‌گذاری</button>
+          <button onclick="showInbox()" class="secondary">بازگشت به صندوق</button>
+        </div>
+      </div>
+    </section>
+
+    <footer class="text-center text-xs mt-12 leading-7">
+      <p>NEON MSG — حرف دلت رو آزادانه بگو 💚</p>
+      <p>نسخه نمایشی • پیام‌ها روی دستگاه ذخیره می‌شوند</p>
+    </footer>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    /*
+      NEON MSG
+      نسخه تک‌فایلی برای Acode
+      ذخیره‌سازی نمایشی با localStorage
+    */
+
+    const $ = id => document.getElementById(id);
+
+    const KEYS = {
+      user: 'neonmsg_username_v1',
+      messages: 'neonmsg_messages_v1'
+    };
+
+    let toastTimer;
+    let currentShareText = '';
+
+    // خواندن اطلاعات با کنترل خطا
+    function readMessages() {
+      try {
+        const value = JSON.parse(localStorage.getItem(KEYS.messages) || '[]');
+        return Array.isArray(value) ? value : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveMessages(messages) {
+      localStorage.setItem(KEYS.messages, JSON.stringify(messages));
+    }
+
+    function getUsername() {
+      return localStorage.getItem(KEYS.user) || '';
+    }
+
+    function normalizeUsername(value) {
+      return value.trim().replace(/^@+/, '').toLowerCase();
+    }
+
+    function validUsername(value) {
+      return /^[a-zA-Z0-9_]{3,24}$/.test(value);
+    }
+
+    function showToast(message) {
+      const toast = $('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 2600);
+    }
+
+    function showPage(pageId) {
+      ['homePage', 'inboxPage', 'sendPage', 'sharePage'].forEach(id => {
+        $(id).classList.toggle('hidden-page', id !== pageId);
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function goHome() {
+      $('usernameInput').value = getUsername();
+      showPage('homePage');
+    }
+
+    // ساخت لینک پروفایل
+    $('usernameForm').addEventListener('submit', event => {
+      event.preventDefault();
+
+      const username = normalizeUsername($('usernameInput').value);
+
+      if (!validUsername(username)) {
+        showToast('نام باید ۳ تا ۲۴ کاراکتر و شامل حروف انگلیسی، عدد یا _ باشد.');
+        return;
+      }
+
+      try {
+        localStorage.setItem(KEYS.user, username);
+        renderInbox();
+        showPage('inboxPage');
+        showToast('پروفایل نمایشی ساخته شد!');
+      } catch {
+        showToast('ذخیره‌سازی مرورگر در دسترس نیست.');
+      }
+    });
+
+    function makeProfileUrl(username) {
+      const url = new URL(window.location.href);
+      url.search = '';
+      url.hash = '';
+      url.searchParams.set('u', username);
+      return url.href;
+    }
+
+    async function copyText(text) {
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          const input = document.createElement('textarea');
+          input.value = text;
+          input.style.position = 'fixed';
+          input.style.opacity = '0';
+          document.body.appendChild(input);
+          input.select();
+
+          const success = document.execCommand('copy');
+          input.remove();
+
+          if (!success) throw new Error('copy failed');
+        }
+
+        showToast('کپی شد! 💚');
+      } catch {
+        showToast('کپی خودکار نشد؛ لینک را دستی انتخاب کن.');
+      }
+    }
+
+    function copyProfileLink() {
+      const username = getUsername();
+      if (!username) return showToast('ابتدا نام کاربری بساز.');
+      copyText(makeProfileUrl(username));
+    }
+
+    async function shareProfileLink() {
+      const username = getUsername();
+      if (!username) return showToast('ابتدا نام کاربری بساز.');
+
+      const url = makeProfileUrl(username);
+
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: 'پیام ناشناس من',
+            text: 'حرف دلت رو ناشناس بهم بگو 💚',
+            url
+          });
+        } catch (error) {
+          if (error.name !== 'AbortError') showToast('اشتراک‌گذاری انجام نشد.');
+        }
+      } else {
+        copyText(url);
+      }
+    }
+
+    function showInbox() {
+      if (!getUsername()) {
+        showPage('homePage');
+        showToast('اول لینک اختصاصی خودت رو بساز.');
+        return;
+      }
+
+      renderInbox();
+      showPage('inboxPage');
+    }
+
+    // نمایش پیام‌ها؛ تمام متن‌ها با textContent درج می‌شوند
+    function renderInbox() {
+      const username = getUsername();
+      $('profileName').textContent = '@' + username;
+      $('profileLink').value = makeProfileUrl(username);
+
+      const messages = readMessages().filter(m => m.owner === username);
+      $('messageCount').textContent = messages.length + ' پیام';
+
+      const list = $('messagesList');
+      list.replaceChildren();
+
+      if (!messages.length) {
+        const empty = document.createElement('div');
+        empty.className = 'text-center py-12 text-gray-500';
+        empty.innerHTML = '<div class="text-4xl mb-4">📭</div><p class="font-bold text-gray-300">هنوز پیامی نداری</p><p class="text-sm mt-2">لینکت رو با دوستات به اشتراک بذار!</p>';
+        list.appendChild(empty);
+        return;
+      }
+
+      messages.slice().reverse().forEach(message => {
+        const card = document.createElement('article');
+        card.className = 'message-card';
+
+        const date = document.createElement('p');
+        date.className = 'text-xs text-gray-500 mb-3';
+        date.textContent = new Date(message.date).toLocaleString('fa-IR');
+
+        const body = document.createElement('p');
+        body.className = 'whitespace-pre-wrap break-words leading-8';
+        body.textContent = message.text;
+
+        const actions = document.createElement('div');
+        actions.className = 'flex flex-wrap items-center gap-2 mt-5 pt-4 border-t border-white/5';
+
+        const like = document.createElement('button');
+        like.className = 'secondary text-sm';
+        like.textContent = message.liked ? '💚 پسندیده شد' : '♡ لایک';
+        like.addEventListener('click', () => toggleLike(message.id));
+
+        const share = document.createElement('button');
+        share.className = 'secondary text-sm';
+        share.textContent = '✦ کارت پیام';
+        share.addEventListener('click', () => openShareCard(message.text));
+
+        const del = document.createElement('button');
+        del.className = 'text-sm text-red-400 px-2 py-2';
+        del.textContent = 'حذف';
+        del.addEventListener('click', () => deleteMessage(message.id));
+
+        actions.append(like, share, del);
+        card.append(date, body, actions);
+        list.appendChild(card);
+      });
+    }
+
+    function toggleLike(id) {
+      const messages = readMessages();
+      const item = messages.find(m => m.id === id && m.owner === getUsername());
+
+      if (!item) return;
+
+      item.liked = !item.liked;
+      saveMessages(messages);
+      renderInbox();
+    }
+
+    function deleteMessage(id) {
+      if (!confirm('این پیام حذف شود؟')) return;
+
+      const messages = readMessages().filter(m =>
+        !(m.id === id && m.owner === getUsername())
+      );
+
+      saveMessages(messages);
+      renderInbox();
+      showToast('پیام حذف شد.');
+    }
+
+    function clearMessages() {
+      if (!confirm('تمام پیام‌های صندوق حذف شوند؟')) return;
+
+      saveMessages(readMessages().filter(m => m.owner !== getUsername()));
+      renderInbox();
+      showToast('صندوق پیام‌ها پاک شد.');
+    }
+
+    function openShareCard(message) {
+      currentShareText = message;
+      $('shareCardText').textContent = message;
+      showPage('sharePage');
+    }
+
+    async function shareMessageText() {
+      const text = currentShareText + '\n\n— NEON MSG';
+
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: 'پیام ناشناس', text });
+        } catch (error) {
+          if (error.name !== 'AbortError') showToast('اشتراک‌گذاری انجام نشد.');
+        }
+      } else {
+        copyText(text);
+      }
+    }
+
+    // ارسال پیام برای نام صاحب لینک
+    function openRecipient(username) {
+      $('recipientName').textContent = '@' + username;
+      $('messageInput').value = '';
+      $('charCount').textContent = '۰ / ۱۰۰۰';
+      $('sendForm').classList.remove('hidden-page');
+      $('successBox').classList.add('hidden-page');
+      showPage('sendPage');
+    }
+
+    $('messageInput').addEventListener('input', () => {
+      $('charCount').textContent =
+        $('messageInput').value.length.toLocaleString('fa-IR') + ' / ۱۰۰۰';
+    });
+
+    $('sendForm').addEventListener('submit', event => {
+      event.preventDefault();
+
+      const params = new URLSearchParams(window.location.search);
+      const owner = normalizeUsername(params.get('u') || '');
+      const messageText = $('messageInput').value.trim();
+
+      if (!validUsername(owner)) {
+        showToast('لینک گیرنده معتبر نیست.');
+        return;
+      }
+
+      if (!messageText) {
+        showToast('اول متن پیام رو بنویس.');
+        return;
+      }
+
+      /*
+        این نسخه فقط در مرورگر فعلی ذخیره می‌کند.
+        برای دریافت واقعی روی دستگاه دیگر باید API بک‌اند اضافه شود.
+      */
+      try {
+        const messages = readMessages();
+
+        messages.push({
+          id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
+          owner,
+          text: messageText,
+          date: new Date().toISOString(),
+          liked: false
+        });
+
+        saveMessages(messages);
+
+        $('sendForm').classList.add('hidden-page');
+        $('successBox').classList.remove('hidden-page');
+        showToast('پیام ثبت شد!');
+      } catch {
+        showToast('ذخیره پیام ممکن نشد.');
+      }
+    });
+
+    function resetSendForm() {
+      $('messageInput').value = '';
+      $('charCount').textContent = '۰ / ۱۰۰۰';
+      $('successBox').classList.add('hidden-page');
+      $('sendForm').classList.remove('hidden-page');
+    }
+
+    function useChallenge(text) {
+      const username = getUsername();
+
+      if (!username) {
+        $('usernameInput').focus();
+        showToast('اول لینک اختصاصی خودت رو بساز.');
+        return;
+      }
+
+      copyText(text);
+      showToast('متن چالش کپی شد؛ همراه لینکت بفرست.');
+    }
+
+    // تشخیص اینکه لینک برای ارسال پیام باز شده یا صفحه اصلی
+    function initialize() {
+      const params = new URLSearchParams(window.location.search);
+      const recipient = normalizeUsername(params.get('u') || '');
+
+      if (recipient && validUsername(recipient)) {
+        openRecipient(recipient);
+      } else if (getUsername()) {
+        $('usernameInput').value = getUsername();
+        showPage('homePage');
+      } else {
+        showPage('homePage');
+      }
+    }
+
+    initialize();
+  </script>
+</body>
+</html>
